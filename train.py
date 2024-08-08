@@ -29,10 +29,10 @@ warnings.filterwarnings(action="ignore")
 
 
 if __name__ == "__main__":
-    train_df = pd.read_csv(os.path.join(DATA_PATH, "house_rent_train.csv"))
+    train_df = pd.read_csv(os.path.join(DATA_PATH, "bike_sharing_train.csv"))
     logger.debug("Load Data..")
-    _X = train_df.drop(["rent", "area_locality", "posted_on"], axis=1)
-    y = np.log1p(train_df["rent"])
+    _X = train_df.drop(["datetime", "season","atemp", "count"], axis=1)
+    y = np.log1p(train_df["count"])
 
     X = preprocess_pipeline.fit_transform(X=_X, y=y)
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     param_set = get_param_set(params=params_candidates)
 
     # Set experiment name for mlflow
-    experiment_name = "new_experiment_with_log"
+    experiment_name = "bike_new_experiment"
     mlflow.set_experiment(experiment_name=experiment_name)
     logger.info("Set an mlflow experiment...")
     mlflow.set_tracking_uri("./mlruns")
@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
     # BentoML에 모델 저장
     bentoml.sklearn.save_model(
-        name="house_rent",
+        name="bike_sharing",
         model=mlflow.sklearn.load_model(best_model_uri),
         signatures={"predict": {"batchable": True, "batch_dim": 0}},
         metadata=best_params,
